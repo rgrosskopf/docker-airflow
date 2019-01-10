@@ -15,6 +15,7 @@ services:
         environment:
             - LOAD_EX=n
             - EXECUTOR=Local
+            - FERNET_KEY=2OMooyhVrycV5Z6BSDmijQ27caIrOkHeArRqgtxEQXs=
         volumes:
             - ./dags:/usr/local/airflow/dags
             # Uncomment to include custom plugins
