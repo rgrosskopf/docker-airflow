@@ -1,4 +1,4 @@
-# docker-airflow modifications
+# docker-airflow w/ Oracle
 A few modifications needed to Puckel's creation for my environment. Uploaded here in case others are trying to get airflow working in with Oracle.
 
 ## tl;dr
