@@ -21,3 +21,14 @@ RUN alien -i oracle-instantclient12.2-basiclite-12.2.0.1.0-1.x86_64.rpm \
     && rm -rf /tmp/* \
 #--
 ```
+## Oracle Connection Format
+This took some experimenting as well. Thanks to [stackoverflow](https://stackoverflow.com/questions/36945811/how-to-connect-airflow-to-oracle-database/43552918#43552918). \
+\
+Conn ID: connName \
+Conn Type: Oracle \
+Host: (DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = mysidname))) \
+Schema: -blank- \
+Login: UserID \
+Password: PW \
+Port: -blank- \
+Extra: -blank-
