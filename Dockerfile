@@ -47,6 +47,8 @@ RUN set -ex \
         rsync \
         netcat \
         locales \
+        alien \
+        libaio1 \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
@@ -56,7 +58,7 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install apache-airflow[crypto,celery,postgres,jdbc,mysql,ssh,s3,samba,slack,gcp_api,devel${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis>=2.10.5,<3' \
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
@@ -69,6 +71,26 @@ RUN set -ex \
         /usr/share/man \
         /usr/share/doc \
         /usr/share/doc-base
+
+#add oracle instant client from local directory
+COPY /oracle/ /tmp/
+WORKDIR /tmp
+RUN alien -i oracle-instantclient12.2-basiclite-12.2.0.1.0-1.x86_64.rpm \
+    && alien -i oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.x86_64.rpm \
+    && alien -i oracle-instantclient12.2-tools-12.2.0.1.0-1.x86_64.rpm \
+    && echo /usr/lib/oracle/12.2/client64/lib > /etc/ld.so.conf.d/oracle-instantclient12.2.conf \
+    && ldconfig \
+    && apt-get purge --auto-remove -yqq alien \
+    && apt-get autoremove -yqq --purge \
+    && apt-get clean \
+    && rm -rf /tmp/*
+#--
+
+#Moved requirements here per https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+COPY requirements.txt /tmp/ 
+WORKDIR /tmp
+RUN pip install --requirement /tmp/requirements.txt
+#--
 
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
